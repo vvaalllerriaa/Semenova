@@ -11,6 +11,7 @@
 https://youtu.be/B5Tu99ZNlgA
 
 Код гри:
+
 #include <iostream>
 using namespace std;
 void winner(int player) {
