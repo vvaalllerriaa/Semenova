@@ -58,7 +58,7 @@ int main() {
             cout << endl;
         }
 
-        // Перевиріка, чи немає перемоги
+        // Перевірка, чи немає перемоги
         for (int i = 0; i < 3; i++) {
             if ((mass[i][0] == mass[i][1] && mass[i][1] == mass[i][2] && mass[i][0] != ' ') ||
                 (mass[0][i] == mass[1][i] && mass[1][i] == mass[2][i] && mass[0][i] != ' ')) {
