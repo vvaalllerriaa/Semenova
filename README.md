@@ -1,5 +1,5 @@
 # Semenova Valeriia 
-My project is presented in the form of a game "Х/O".
+##My project is presented in the form of a game "Х/O".
 
 Rules of the game:
 Two players participate in the game, one of whom is responsible for the X sign, and the other for the O sign. On each turn, players must place an O or an X on a 3 by 3 grid. The first player to place three identical symbols in a horizontal, vertical, or diagonal row wins the game.
