@@ -1,0 +1,72 @@
+#include <iostream>
+using namespace std;
+void winner(int player) {
+    if (player % 2 == 0) {
+        cout << "Player 2 wins!" << endl;  // If player % 2 == 0, then player 2 wins
+    } else {
+        cout << "Player 1 wins!" << endl;  // If player % 2 == 1, then player 1 wins
+    }
+}
+int main() {
+    char mass[3][3] = { {' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '} };
+    int player = 1;
+    while(true){
+        int a, b;
+        cout << "Enter the field (row and column): ";
+        cin >> a >> b;
+        // Check array bounds
+        if (a < 0 || a >= 3 || b < 0 || b >= 3) {
+            cout << "Invalid input. Please enter values between 0 and 2." << endl;
+            continue;
+        }
+        // Checking if the field is empty
+        if (mass[a][b] != ' ') {
+            cout << "Field already occupied. Please choose another one." << endl;
+            continue;
+        }
+        // Player tag settings
+        if (player % 2 == 0) {
+            mass[a][b] = 'X';
+        } else {
+            mass[a][b] = 'O';
+        }
+        // Display field
+        for(int i = 0; i < 3; i++) {
+            cout << '|';
+            for(int j = 0; j < 3; j++) {
+                cout << mass[i][j] << '|';
+            }
+            cout << endl;
+        }
+        // Checking if there is no win
+        for (int i = 0; i < 3; i++) {
+            if ((mass[i][0] == mass[i][1] && mass[i][1] == mass[i][2] && mass[i][0] != ' ') ||
+                (mass[0][i] == mass[1][i] && mass[1][i] == mass[2][i] && mass[0][i] != ' ')) {
+                winner(player);
+                return 0;
+            }
+        }
+        if ((mass[0][0] == mass[1][1] && mass[1][1] == mass[2][2] && mass[0][0] != ' ') ||
+            (mass[0][2] == mass[1][1] && mass[1][1] == mass[2][0] && mass[0][2] != ' ')) {
+            winner(player);
+            return 0;
+        }
+        // Checking for a tie
+        bool draw = true;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (mass[i][j] == ' ') {
+                    draw = false;
+                    break;
+                }
+            }
+        }
+        if (draw) {
+            cout << "Draw!" << endl;
+            return 0;
+        }
+        // Pass the code to the next player
+        player++;
+    }
+    return 0;
+}
