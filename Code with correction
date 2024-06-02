@@ -1,0 +1,158 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <ctime>
+#include <json/json.h>
+
+using namespace std;
+
+// Function to write logs to a CSV file
+void write_logs(const string& filename, const string& message) {
+    ofstream file(filename, ios::app);
+    if (file.is_open()) {
+        time_t now = time(0);
+        tm* timeinfo = localtime(&now);
+        char timestamp[20];
+        strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", timeinfo);
+
+        file << timestamp << "," << message << endl;
+        file.close();
+    } else {
+        cerr << "Error: Unable to open file " << filename << endl;
+    }
+}
+
+// Function to read logs from a CSV file
+vector<pair<string, string>> read_logs(const string& filename) {
+    vector<pair<string, string>> logs;
+    ifstream file(filename);
+    if (file.is_open()) {
+        string line;
+        while (getline(file, line)) {
+            size_t pos = line.find(',');
+            if (pos != string::npos) {
+                string timestamp = line.substr(0, pos);
+                string message = line.substr(pos + 1);
+                logs.push_back(make_pair(timestamp, message));
+            }
+        }
+        file.close();
+    } else {
+        cerr << "Error: Unable to open file " << filename << endl;
+    }
+    return logs;
+}
+
+// Function to read wins from a JSON file
+Json::Value read_wins(const string& filename) {
+    Json::Value wins;
+    ifstream file(filename);
+    if (file.is_open()) {
+        file >> wins;
+        file.close();
+    } else {
+        cerr << "Error: Unable to open file " << filename << endl;
+    }
+    return wins;
+}
+
+// Function to write wins to a JSON file
+void write_wins(const string& filename, const Json::Value& wins) {
+    ofstream file(filename);
+    if (file.is_open()) {
+        file << wins;
+        file.close();
+    } else {
+        cerr << "Error: Unable to open file " << filename << endl;
+    }
+}
+
+void winner(int player, Json::Value& wins) {
+    if (player % 2 == 0) {
+        cout << "Player 2 wins!" << endl;
+        wins["wins"]["X"] = wins["wins"]["X"].asInt() + 1;
+    } else {
+        cout << "Player 1 wins!" << endl;
+        wins["wins"]["O"] = wins["wins"]["O"].asInt() + 1;
+    }
+    write_wins("wins.json", wins);
+}
+
+int main() {
+    char mass[3][3] = { {' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '} };
+    int player = 1;
+    Json::Value wins = read_wins("wins.json");
+
+    while(true){
+        int a, b;
+        cout << "Enter the field (row and column): ";
+        cin >> a >> b;
+
+        // Check array bounds
+        if (a < 0 || a >= 3 || b < 0 || b >= 3) {
+            cout << "Invalid input. Please enter values between 0 and 2." << endl;
+            continue;
+        }
+
+        // Checking if the field is empty
+        if (mass[a][b] != ' ') {
+            cout << "Field already occupied. Please choose another one." << endl;
+            continue;
+        }
+
+        // Player tag settings
+        if (player % 2 == 0) {
+            mass[a][b] = 'X';
+        } else {
+            mass[a][b] = 'O';
+        }
+
+        // Display field
+        for(int i = 0; i < 3; i++) {
+            cout << '|';
+            for(int j = 0; j < 3; j++) {
+                cout << mass[i][j] << '|';
+            }
+            cout << endl;
+        }
+
+        // Log the move
+        write_logs("logs.csv", "User chose the (" + to_string(a) + "," + to_string(b) + ") cell");
+
+        // Checking if there is no win
+        for (int i = 0; i < 3; i++) {
+            if ((mass[i][0] == mass[i][1] && mass[i][1] == mass[i][2] && mass[i][0] != ' ') ||
+                (mass[0][i] == mass[1][i] && mass[1][i] == mass[2][i] && mass[0][i] != ' ')) {
+                winner(player, wins);
+                return 0;
+            }
+        }
+        if ((mass[0][0] == mass[1][1] && mass[1][1] == mass[2][2] && mass[0][0] != ' ') ||
+            (mass[0][2] == mass[1][1] && mass[1][1] == mass[2][0] && mass[0][2] != ' ')) {
+            winner(player, wins);
+            return 0;
+        }
+
+        // Checking for a tie
+        bool draw = true;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (mass[i][j] == ' ') {
+                    draw = false;
+                    break;
+                }
+            }
+        }
+        if (draw) {
+            cout << "Draw!" << endl;
+            write_wins("wins.json", wins);
+            return 0;
+        }
+
+        // Pass the code to the next player
+        player++;
+    }
+
+    return 0;
+}
